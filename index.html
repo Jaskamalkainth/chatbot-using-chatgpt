@@ -136,13 +136,13 @@
         const userInput = chatInput.value;
         addMessage(userInput, 'user');
         chatInput.value = '';
-
+        
         const formData = new FormData();
         formData.append('message', userInput);
-        
+
         fetch('/chat', {
           method: 'POST',
-          body: new FormData(formData)
+          body: formData
         })
         .then(response => response.json())
         .then(data => {
