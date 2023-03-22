@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chatbot</title>
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 16px;
+        }
+        
+        .chat-container {
+          width: 600px;
+          margin: 50px auto;
+          border: 1px solid #ccc;
+          box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        
+        .chat-header {
+          background-color: #000000;
+          color: #fff;
+          padding: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .chat-header h1 {
+          margin: 0;
+          font-size: 20px;
+        }
+        
+        .chat-body {
+          padding: 10px;
+          max-height: 600px;
+          overflow-y: scroll;
+        }
+        
+        .chat-message {
+          margin-bottom: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .chat-message.bot {
+          align-items: flex-end;
+        }
+        
+        .chat-message p {
+          background-color: #f1f1f1;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 0;
+          max-width: 60%;
+          word-wrap: break-word;
+          box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .chat-message.bot p {
+          background-color: #2b15aa;
+          color: #fff;
+        }
+        
+        .chat-footer {
+          background-color: #f1f1f1;
+          padding: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .chat-footer input[type=text] {
+          flex: 1;
+          border: none;
+          padding: 10px;
+          font-size: 16px;
+        }
+        
+        .chat-footer button {
+          background-color: #1423aa;
+          color: #fff;
+          border: none;
+          padding: 10px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+        
+        .chat-footer button:focus {
+          outline: none;
+        }
+        
+        #clear-chat-btn {
+          background-color: #f1f1f1;
+          border: none;
+          color: #4cacaf;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        
+        #clear-chat-btn:hover {
+          color: #000000;
+        }
+      </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>Chatbot with Ugly UI</h1>
+        <button id="clear-chat-btn">Clear Chat</button>
+      </div>
+      <div class="chat-body" id="chat-body">
+        <div class="chat-message bot">
+          <p>Welcome to the chatbot. How can I assist you today?</p>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <form id="chat-form" action="/chat" method="POST">
+            <input type="text" name="message" placeholder="Type a message..." id="chat-input">
+            <button type="submit">Send</button>
+          </form>
+      </div>
+    </div>
+    <script>
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatBody = document.getElementById('chat-body');
+      const clearChatBtn = document.getElementById('clear-chat-btn');
+
+      chatForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const userInput = chatInput.value;
+        addMessage(userInput, 'user');
+        chatInput.value = '';
+
+        fetch('/chat', {
+          method: 'POST',
+          body: new FormData(chatForm)
+        })
+        .then(response => response.json())
+        .then(data => {
+          const botResponse = data.response;
+          addMessage(botResponse, 'bot');
+        })
+        .catch(error => console.error(error));
+      });
+
+      clearChatBtn.addEventListener('click', () => {
+        while (chatBody.firstChild) {
+          chatBody.removeChild(chatBody.firstChild);
+        }
+      });
+
+      function addMessage(message, type) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message');
+        messageElement.classList.add(type);
+        messageElement.innerHTML = `<p>${message}</p>`;
+        chatBody.appendChild(messageElement);
+      }
+    </script>
+  </body>
+</html>
